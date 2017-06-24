@@ -29,14 +29,16 @@ switch (action) {
 		mySpotify();
 		break;
 	case "movie-this":
-		movie();
+		myMovie();
 		break;
 	case "do-what-it-says":
-		dowhatitsays();
+		myDoWhatItSays();
 		break;
+  default: // Adds user instructions to re-select an available action
+    console.log("Please select an action request listed below:");
+    console.log("my-tweets, spotify-this-song, movie-this, do-what-it-says");
+    break;
 }
-// Put in additional case like else that shows error in console.log if wrong command is inputted.
-
 
 // Twitter API 
 // -------------------------------------------------------------------
@@ -65,33 +67,21 @@ function mySpotify() {
     if (err) {
       console.log('Error occurred: ' + err);
     } else {
-      var data_object = JSON.stringify(data, null, 2);
-      //console.log(data);
-      //console.log(JSON.stringify(data, null, 2));
-      console.log(JSON.parse(data_object).tracks.items);
+      // Returns JSON info for selected track
+      console.log(JSON.stringify(data, null, 2));
+
+      // Returns href reference in JSON -- Need help going down levels in JSON to return data
+      var album = data.tracks.href;
+      console.log(album);
       
+      //Check class activity with weather-js and geocoder (answer maybe here)
       }
   });
 };
 
 
-
-// var nodeArgs = process.argv;
-// var value = "";
-// for (var i = 3; i < nodeArgs.length; i++) {
-//   if (i > 3 && i < nodeArgs.length){
-//     value = value + "+" + nodeArgs[i];
-//   }
-//    else {
-//     value += nodeArgs[i];
-//   }
-// }
-
-
-// spotify
-//   .search({ type: 'track', query: value, limit: 1 })
-//   .then(function(response) {
-//   	console.log("-------------------------------------");
+// USE THIS TO CLEAN UP THE REPONSE FOR SPOTIFY
+//    console.log("-------------------------------------");
 //     console.log("-------------------------------------");
 //     console.log("Spotify Track Search Results Below");
 //     console.log("-------------------------------------");
@@ -103,79 +93,75 @@ function mySpotify() {
 //     console.log("-------------------------------------");
 //     console.log("-------------------------------------");
 //     console.log("");
-//   })
-//   .catch(function(err) {
-//     console.log("");
-//     console.log(error);
-//     console.log("");
-// })
-// }
+
+
+//MOVIE DBM API
 // -------------------------------------------------------------------
-// Spotify API
 
+function myMovie() {
 
+// Take in the command line arguments
+var nodeArgs = process.argv;
 
-// MOVIE DBM API - Still need to review
+// Create an empty string for holding the movie name
+var movieName = "";
+
+// Capture all the words in the movie name (ignore first 3 node arguments)
+for (var i = 3; i < nodeArgs.length; i++) {
+
+// If TRUE, Build a string with the movie name.
+ if (i > 3 && i < nodeArgs.length){
+   movieName = movieName + "+" + nodeArgs[i];
+ } else {
+   movieName += nodeArgs[i];
+ }
+}
+
+// Create URL query variable to store URL to request JSON from OMDB API
+var queryUrl = "http://www.omdbapi.com/?apikey=40e9cece&t=" + movieName + "&y=&plot=short&r=json";
+//console.log(queryUrl);
+
+//Run request to the OMDB API with URL variable
+request(queryUrl, function(error, response, body) {
+
+  // If the request was successful...
+  if (!error && response.statusCode === 200) {
+
+    // Then log the body details from the OMDB API
+    console.log("");
+    console.log("-------------------------------------");
+    console.log("-------------------------------------");
+    console.log("The Title of the movie: " + JSON.parse(body).Title);
+    console.log("-------------------------------------");
+    console.log("The release year of the movie: " + JSON.parse(body).Year);
+    console.log("IMDB Rating: " + JSON.parse(body).Ratings);
+    console.log("Country: " + JSON.parse(body).Country);
+    console.log("Language: " + JSON.parse(body).Language);
+    console.log("Movie Plot: " + JSON.parse(body).Plot);
+    console.log("Actors: " + JSON.parse(body).Actors);
+    //console.log("Rotten Tomatoes URL: " + JSON.parse(body).Website;
+    console.log("Genre: " + JSON.parse(body).Genre);
+    console.log("Actors: " + JSON.parse(body).Actors);
+    console.log("Awards: " + JSON.parse(body).Awards);
+    console.log("-------------------------------------");
+    console.log("-------------------------------------");
+    console.log("");
+   } else {
+    console.log(error);
+   };
+ });
+}
+
+// DO-WHAT-IT-SAYS 
 // -------------------------------------------------------------------
-// function movie() {
-// // Store all of the arguments in an array
-// var nodeArgs = process.argv;
-// // Grab or assemble the movie name and store it in a variable called "value"
-// var value = "";
-// // Loop through all the words in the node argument
-// // And do a little for-loop magic to handle the inclusion of "+"s
-// for (var i = 2; i < nodeArgs.length; i++) {
-// 	if (i > 2 && i < nodeArgs.length){
-// 		value = value + "+" + nodeArgs[i];
-// 	} else {
-// 		value += nodeArgs[i];
-// 	}
-// }
-// console.log(value);
-
-// // Then run a request to the OMDB API with the movie specified
-// var queryUrl = "http://www.omdbapi.com/?apikey=40e9cece&t=" + value + "&y=&plot=short&r=json";
-// // This line is just to help us debug against the actual URL.
-// console.log(queryUrl);
-// request(queryUrl, function(error, response, body) {
-//   // If the request was successful...
-//   if (!error && response.statusCode === 200) {
-//     // Then log the body from the site!
-//     console.log("");
-//     console.log("-------------------------------------");
-//     console.log("-------------------------------------");
-//     console.log("The Title of the movie: " + JSON.parse(body).Title);
-//     console.log("-------------------------------------");
-//     console.log("The release year of the movie: " + JSON.parse(body).Year);
-//     console.log("IMDB Rating: " + JSON.parse(body).Ratings);
-//     console.log("Country: " + JSON.parse(body).Country);
-//     console.log("Language: " + JSON.parse(body).Language);
-//     console.log("Movie Plot: " + JSON.parse(body).Plot);
-//     console.log("Actors: " + JSON.parse(body).Actors);
-//     // console.log("Rotten Tomatoes URL: " + JSON.parse(body).Website;
-//     console.log("Genre: " + JSON.parse(body).Genre);
-//     console.log("Actors: " + JSON.parse(body).Actors);
-//     console.log("Awards: " + JSON.parse(body).Awards);
-//     console.log("-------------------------------------");
-//     console.log("-------------------------------------");
-//     console.log("");
-//    };
-//  });
-// }
+// Questions: How to connect spotify API using the readme txt file?
+//
 // // -------------------------------------------------------------------
-// // MOVIE DBM API
-
-
-
-// // DO-WHAT-IT-SAYS
-// // I have had a hard time figuring out this one. I really dont understand this function very well.
-// // Also have been having a hard time finding out how to connect to the spotify API properly.
-// // -------------------------------------------------------------------
-// function dowhatitsays() {
+// function myDoWhatItSays() {
 //   var song = "I want it that way";
 //   var spotify = new Spotify({
-//   id: '54d72841e6a940adb2b5bf919507c6f6',
-//   secret: '1181e12735de4805b84ecf1705dd0352'
+//   id: 'input key',
+//   secret: 'input key'
 // })
 
 // // Trying to use the random.txt file to make a command to play a song for spotify.
