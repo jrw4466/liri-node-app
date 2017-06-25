@@ -3,7 +3,7 @@ var fs = require("fs");
 
 //NPM Packages
 var request = require("request");
-//var inquirer = require("inquirer");
+//npmvar inquirer = require("inquirer");
 var Twitter = require("twitter");
 var Spotify = require("node-spotify-api");
 
@@ -68,32 +68,15 @@ function mySpotify() {
       console.log('Error occurred: ' + err);
     } else {
       // Returns JSON info for selected track
-      console.log(JSON.stringify(data, null, 2));
-
-      // Returns href reference in JSON -- Need help going down levels in JSON to return data
-      var album = data.tracks.href;
-      console.log(album);
-      
-      //Check class activity with weather-js and geocoder (answer maybe here)
+      //console.log(JSON.stringify(data, null, 2));
+     
+      console.log("\nArtist: " + JSON.stringify(data.tracks.items[0].artists[0].name, null, 2) + "\n ");
+      console.log("Song Title: " + JSON.stringify(data.tracks.items[0].name) + "\n ");
+      console.log("Album: " +JSON.stringify(data.tracks.items[0].album.name) + "\n ");
+      console.log("Link: " + JSON.stringify(data.tracks.items[0].album.external_urls));
       }
   });
 };
-
-
-// USE THIS TO CLEAN UP THE REPONSE FOR SPOTIFY
-//    console.log("-------------------------------------");
-//     console.log("-------------------------------------");
-//     console.log("Spotify Track Search Results Below");
-//     console.log("-------------------------------------");
-//     console.log("-------------------------------------");
-//     console.log("");
-//     console.log("This song you searched for: " + value);
-//     console.log("");
-//     console.log(response);
-//     console.log("-------------------------------------");
-//     console.log("-------------------------------------");
-//     console.log("");
-
 
 //MOVIE DBM API
 // -------------------------------------------------------------------
@@ -118,7 +101,7 @@ for (var i = 3; i < nodeArgs.length; i++) {
 }
 
 // Create URL query variable to store URL to request JSON from OMDB API
-var queryUrl = "http://www.omdbapi.com/?apikey=40e9cece&t=" + movieName + "&y=&plot=short&r=json";
+var queryUrl = "http://www.omdbapi.com/?apikey=40e9cece&t=" + movieName + "&tomatoes=true&y=&plot=short&r=json";
 //console.log(queryUrl);
 
 //Run request to the OMDB API with URL variable
@@ -127,6 +110,7 @@ request(queryUrl, function(error, response, body) {
   // If the request was successful...
   if (!error && response.statusCode === 200) {
 
+    //body = JSON.parse(body);
     // Then log the body details from the OMDB API
     console.log("");
     console.log("-------------------------------------");
@@ -139,7 +123,7 @@ request(queryUrl, function(error, response, body) {
     console.log("Language: " + JSON.parse(body).Language);
     console.log("Movie Plot: " + JSON.parse(body).Plot);
     console.log("Actors: " + JSON.parse(body).Actors);
-    //console.log("Rotten Tomatoes URL: " + JSON.parse(body).Website;
+    //console.log("Rotten Tomatoes URL: " + JSON.parse(body).tomatoURL;
     console.log("Genre: " + JSON.parse(body).Genre);
     console.log("Actors: " + JSON.parse(body).Actors);
     console.log("Awards: " + JSON.parse(body).Awards);
