@@ -3,7 +3,7 @@ var fs = require("fs");
 
 //NPM Packages
 var request = require("request");
-//npmvar inquirer = require("inquirer");
+var inquirer = require("inquirer");
 var Twitter = require("twitter");
 var Spotify = require("node-spotify-api");
 
@@ -18,6 +18,10 @@ var limitTweets = 20;
 //Creates an object to auth Spotify queries
 var spotifyInfo = new Spotify(keys.spotifyKeys);
 
+//Global Variables
+var defaultMusic = "The Sign";
+var defaultMovie = "Mr. Nobody";
+
 var action = process.argv[2];
 var value = process.argv[3];
 
@@ -26,19 +30,20 @@ switch (action) {
 		myTweets();
 		break;
 	case "spotify-this-song":
-		mySpotify();
+    mySpotify();
 		break;
 	case "movie-this":
 		myMovie();
 		break;
 	case "do-what-it-says":
-		myDoWhatItSays();
+		random();
 		break;
   default: // Adds user instructions to re-select an available action
     console.log("Please select an action request listed below:");
     console.log("my-tweets, spotify-this-song, movie-this, do-what-it-says");
     break;
 }
+
 
 // Twitter API 
 // -------------------------------------------------------------------
@@ -108,28 +113,21 @@ var queryUrl = "http://www.omdbapi.com/?apikey=40e9cece&t=" + movieName + "&toma
 request(queryUrl, function(error, response, body) {
 
   // If the request was successful...
-  if (!error && response.statusCode === 200) {
-
-    //body = JSON.parse(body);
-    // Then log the body details from the OMDB API
-    console.log("");
-    console.log("-------------------------------------");
-    console.log("-------------------------------------");
-    console.log("The Title of the movie: " + JSON.parse(body).Title);
-    console.log("-------------------------------------");
-    console.log("The release year of the movie: " + JSON.parse(body).Year);
-    console.log("IMDB Rating: " + JSON.parse(body).Ratings);
-    console.log("Country: " + JSON.parse(body).Country);
-    console.log("Language: " + JSON.parse(body).Language);
-    console.log("Movie Plot: " + JSON.parse(body).Plot);
-    console.log("Actors: " + JSON.parse(body).Actors);
-    //console.log("Rotten Tomatoes URL: " + JSON.parse(body).tomatoURL;
-    console.log("Genre: " + JSON.parse(body).Genre);
-    console.log("Actors: " + JSON.parse(body).Actors);
-    console.log("Awards: " + JSON.parse(body).Awards);
-    console.log("-------------------------------------");
-    console.log("-------------------------------------");
-    console.log("");
+    if (!error && response.statusCode === 200) {
+      
+      var body = JSON.parse(body);
+      
+      //Then log the body details from the OMDB API
+      console.log("\nMovie Title: " + body.Title + "\n ");
+      console.log("Year Released: " + body.Released + "\n ");
+      console.log("Rating: " + body.Rated + "\n ");
+      console.log("Production Country: " + body.Country + "\n ");
+      console.log("Language: " + body.Language + "\n ");
+      console.log("Plot: " + body.Plot + "\n ");
+      console.log("Actors: " + body.Actors + "\n ");
+      console.log("Rotten Tomatoes Rating: " + body.Ratings[1].value + "\n ");
+      console.log("Rotten Tomatoes URL: " + body.tomatoURL);
+  
    } else {
     console.log(error);
    };
@@ -138,34 +136,32 @@ request(queryUrl, function(error, response, body) {
 
 // DO-WHAT-IT-SAYS 
 // -------------------------------------------------------------------
-// Questions: How to connect spotify API using the readme txt file?
-//
-// // -------------------------------------------------------------------
-// function myDoWhatItSays() {
-//   var song = "I want it that way";
-//   var spotify = new Spotify({
-//   id: 'input key',
-//   secret: 'input key'
-// })
+// Function takes the data from my random.txt file and 
+// passes it as a search value in the Spotify function
 
-// // Trying to use the random.txt file to make a command to play a song for spotify.
-// fs.readFile("random.txt", "utf8", function(err, data) {
-// 	if (err){
-// 		return console.log(err);
-// 	}
+function random() {
 
-// 	data = data.split(", ");
-// 	var results = 0;
-// })
-// spotify
-//   .search({ type: 'track', query: 'I Want it That Way', limit: 1 })
-//   .then(function(response) {
-//   	console.log("-------------------------------------");
-//     console.log("-------------------------------------");
-//     console.log("Spotify Track Search Results Below for 'I want it that way': ");
-//     console.log("-------------------------------------");
-//     console.log("-------------------------------------");
-//     console.log("");
-//     console.log(response);
-// 	});
+  fs.readFile('./random.txt', 'utf8', function(err, data) {
+    if (err) {
+      return console.log(err);
+    }
+    else {
+      console.log(data);
+
+      //Converst data in text file into array
+      var arr = data.split(",");
+      value = arr[1];
+        // If command name at index[0] matches the string, invoke the function
+        if(arr[0] == "movie-this") {
+          myMovie(value);
+        }
+        else if (arr[0] == "spotify-this-song") {
+          mySpotify(value);
+        }
+        else if (arr[0] == "my-tweets") {
+          myTweets();
+        }
+    }
+  });  
+};
 
